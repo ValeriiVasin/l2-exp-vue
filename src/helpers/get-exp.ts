@@ -94,7 +94,8 @@ const levels = new Map([
 
 function levelToExp(lvl: number): number {
   if (lvl > 90 || lvl < 1) {
-    throw 'level should be in range [1, 90]';
+    console.error(`level should be in range [1, 90]: "${lvl}"`);
+    return 0;
   }
 
   const base = Math.floor(lvl);
@@ -104,7 +105,8 @@ function levelToExp(lvl: number): number {
   const nextExp = levels.get(base + 1);
 
   if (typeof baseExp !== 'number' || typeof nextExp !== 'number') {
-    throw 'something went wrong';
+    console.error('something went wrong');
+    return 0;
   }
 
   return baseExp + Math.floor((nextExp - baseExp) * rest);
