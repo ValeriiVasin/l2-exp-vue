@@ -99,6 +99,7 @@ interface State {
 }
 
 export default {
+  /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
   setup() {
     const state: State = reactive<State>({
       scrolls: '',
