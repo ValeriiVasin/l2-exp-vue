@@ -104,7 +104,7 @@ main {
 .form {
   display: inline-flex;
 }
-
+/* specificity needed to overwrite pure css styles */
 form input.error {
   border-color: red;
   &:focus {
