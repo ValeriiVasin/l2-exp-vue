@@ -82,7 +82,6 @@ main {
 </style>
 
 <script lang="ts">
-import { ComputedRef, defineComponent } from 'vue';
 import { reactive, computed } from 'vue';
 
 interface State {
