@@ -31,4 +31,8 @@ describe('parsing string to number', () => {
     expect(parseNumber('10,2k')).toBe(10200);
     expect(parseNumber('10.2kk')).toBe(10200000);
   });
+
+  it('NaN for invalid numbers', () => {
+    expect(parseNumber('hello')).toBeNaN();
+  });
 });
