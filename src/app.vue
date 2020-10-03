@@ -12,6 +12,7 @@
             min="0"
             max="90"
             step="any"
+            :class="{ error: !isValidFrom }"
           />
         </div>
 
@@ -24,6 +25,7 @@
             :min="from"
             max="90"
             step="any"
+            :class="{ error: !isValidTo }"
           />
         </div>
 
@@ -64,6 +66,8 @@
             id="exp"
             autocomplete="off"
             v-model.trim="stringifiedExp"
+            placeholder="25kk"
+            :class="{ error: !isValidExp }"
           />
         </div>
 
@@ -74,6 +78,8 @@
             id="time"
             autocomplete="off"
             v-model.trim="stringifiedTime"
+            placeholder="20м"
+            :class="{ error: !isValidTime }"
           />
         </div>
 
@@ -94,8 +100,16 @@ main {
   display: flex;
   justify-content: center;
 }
+
 .form {
   display: inline-flex;
+}
+
+form input.error {
+  border-color: red;
+  &:focus {
+    border-color: red;
+  }
 }
 </style>
 
@@ -123,6 +137,14 @@ export default {
     const from = ref(76);
     const to = ref(80);
 
+    const isValidFrom = computed(
+      () => typeof from.value === 'number' && from.value >= 1 && from.value < 90
+    );
+    const isValidTo = computed(
+      () =>
+        typeof to.value === 'number' && to.value > from.value && to.value < 90
+    );
+
     const needExp = computed(() => getExp({ from: from.value, to: to.value }));
     const needExpStringified = computed(() => formatNumber(needExp.value));
 
@@ -148,7 +170,9 @@ export default {
 
     return {
       from,
+      isValidFrom,
       to,
+      isValidTo,
 
       stringifiedExp,
       exp,
