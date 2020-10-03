@@ -64,10 +64,10 @@
 
         <div class="pure-control-group">
           <label for="time">время</label>
-          <input type="text" id="time" v-model.trim="state.time" />
+          <input type="text" id="time" v-model.trim="stringifiedTime" />
         </div>
 
-        <div class="pure-control-group" v-if="isValidExp">
+        <div class="pure-control-group" v-if="isValidExp && isValidTime">
           <label for="result">потребуется</label>
           <input type="text" readonly id="result" :value="result" />
         </div>
@@ -91,23 +91,26 @@ import { reactive, computed, ref } from 'vue';
 import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
+import { parseTime } from './helpers/parse-time';
 
 interface State {
   scrolls: string;
   scrollsCheckbox: boolean;
-  time: string;
 }
 
 export default {
   setup() {
     const state: State = reactive<State>({
       scrolls: '',
-      scrollsCheckbox: false,
-      time: '1ч'
+      scrollsCheckbox: false
     });
 
     const from = ref(76);
     const to = ref(80);
+
+    const stringifiedTime = ref('1ч');
+    const time = computed(() => parseTime(stringifiedTime.value));
+    const isValidTime = computed(() => !Number.isNaN(time.value));
 
     const stringifiedExp = ref('30kk');
     const exp = computed(() => parseNumber(stringifiedExp.value));
@@ -125,6 +128,9 @@ export default {
       stringifiedExp,
       exp,
       isValidExp,
+
+      stringifiedTime,
+      isValidTime,
 
       needExp,
       needExpStringified,
