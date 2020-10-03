@@ -48,7 +48,12 @@
 
         <div class="pure-control-group">
           <label for="need-exp">нужно опыта</label>
-          <input readonly id="need-exp" type="text" :value="needExp" />
+          <input
+            readonly
+            id="need-exp"
+            type="text"
+            :value="needExpStringified"
+          />
         </div>
 
         <legend>расчет</legend>
@@ -83,6 +88,8 @@ main {
 
 <script lang="ts">
 import { reactive, computed } from 'vue';
+import { getExp } from './helpers/get-exp';
+import { formatNumber } from './helpers/format-number';
 
 interface State {
   from: number;
@@ -104,11 +111,13 @@ export default {
       time: '1ч'
     });
 
-    const needExp = computed(() => state.from + state.to);
+    const needExp = computed(() => getExp({ from: state.from, to: state.to }));
+    const needExpStringified = computed(() => formatNumber(needExp.value));
     const result = computed(() => '10д 8ч 10м');
 
     return {
       needExp,
+      needExpStringified,
       result,
       state
     };

@@ -100,8 +100,12 @@ function levelToExp(lvl: number): number {
   const base = Math.floor(lvl);
   const rest = lvl - base;
 
-  const baseExp = levels.get(base)!;
-  const nextExp = levels.get(base + 1)!;
+  const baseExp = levels.get(base);
+  const nextExp = levels.get(base + 1);
+
+  if (typeof baseExp !== 'number' || typeof nextExp !== 'number') {
+    throw 'something went wrong';
+  }
 
   return baseExp + Math.floor((nextExp - baseExp) * rest);
 }
