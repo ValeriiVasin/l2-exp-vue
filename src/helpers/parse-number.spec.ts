@@ -35,4 +35,12 @@ describe('parsing string to number', () => {
   it('NaN for invalid numbers', () => {
     expect(parseNumber('hello')).toBeNaN();
   });
+
+  it('empty string is not valid', () => {
+    expect(parseNumber('')).toBeNaN();
+  });
+
+  it('zero', () => {
+    expect(parseNumber('0')).toBe(0);
+  });
 });

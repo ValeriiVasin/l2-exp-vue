@@ -56,18 +56,31 @@
           />
         </div>
 
-        <legend>расчет</legend>
+        <legend>скорость прокачки</legend>
         <div class="pure-control-group">
           <label for="exp">опыт</label>
-          <input type="text" id="exp" v-model.trim="stringifiedExp" />
+          <input
+            type="text"
+            id="exp"
+            autocomplete="off"
+            v-model.trim="stringifiedExp"
+          />
         </div>
 
         <div class="pure-control-group">
           <label for="time">время</label>
-          <input type="text" id="time" v-model.trim="stringifiedTime" />
+          <input
+            type="text"
+            id="time"
+            autocomplete="off"
+            v-model.trim="stringifiedTime"
+          />
         </div>
 
-        <div class="pure-control-group" v-if="isValidExp && isValidTime">
+        <div
+          class="pure-control-group"
+          v-if="isValidExp && isValidTime && result"
+        >
           <label for="result">потребуется</label>
           <input type="text" readonly id="result" :value="result" />
         </div>
@@ -92,6 +105,7 @@ import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
 import { parseTime } from './helpers/parse-time';
+import { timeToString } from './helpers/time-to-string';
 
 interface State {
   scrolls: string;
@@ -109,18 +123,28 @@ export default {
     const from = ref(76);
     const to = ref(80);
 
+    const needExp = computed(() => getExp({ from: from.value, to: to.value }));
+    const needExpStringified = computed(() => formatNumber(needExp.value));
+
+    const stringifiedExp = ref('30kk');
+    const exp = computed(() => parseNumber(stringifiedExp.value));
+    const isValidExp = computed(
+      () => !Number.isNaN(exp.value) && exp.value > 0
+    );
+
     const stringifiedTime = ref('1ч');
     const time = computed(() => parseTime(stringifiedTime.value));
     const isValidTime = computed(() => !Number.isNaN(time.value));
 
-    const stringifiedExp = ref('30kk');
-    const exp = computed(() => parseNumber(stringifiedExp.value));
-    const isValidExp = computed(() => !Number.isNaN(exp.value));
+    const expPerMinute = computed(() => Math.floor(exp.value / time.value));
 
-    const needExp = computed(() => getExp({ from: from.value, to: to.value }));
-    const needExpStringified = computed(() => formatNumber(needExp.value));
+    const result = computed(() => {
+      if (expPerMinute.value === 0) {
+        return '';
+      }
 
-    const result = computed(() => '10д 8ч 10м');
+      return timeToString(Math.floor(needExp.value / expPerMinute.value));
+    });
 
     return {
       from,
