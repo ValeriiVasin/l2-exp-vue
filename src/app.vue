@@ -8,7 +8,7 @@
           <input
             type="number"
             id="from"
-            v-model.number="state.from"
+            v-model.number="from"
             min="0"
             max="90"
             step="any"
@@ -20,8 +20,8 @@
           <input
             type="number"
             id="to"
-            v-model.number="state.to"
-            :min="state.from"
+            v-model.number="to"
+            :min="from"
             max="90"
             step="any"
           />
@@ -59,7 +59,7 @@
         <legend>расчет</legend>
         <div class="pure-control-group">
           <label for="exp">опыт</label>
-          <input type="text" id="exp" v-model.trim="state.exp" />
+          <input type="text" id="exp" v-model.trim="stringifiedExp" />
         </div>
 
         <div class="pure-control-group">
@@ -67,7 +67,7 @@
           <input type="text" id="time" v-model.trim="state.time" />
         </div>
 
-        <div class="pure-control-group">
+        <div class="pure-control-group" v-if="isValidExp">
           <label for="result">потребуется</label>
           <input type="text" readonly id="result" :value="result" />
         </div>
@@ -87,35 +87,45 @@ main {
 </style>
 
 <script lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive, computed, ref } from 'vue';
 import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
+import { parseNumber } from './helpers/parse-number';
 
 interface State {
-  from: number;
-  to: number;
   scrolls: string;
   scrollsCheckbox: boolean;
-  exp: string;
   time: string;
 }
 
 export default {
   setup() {
     const state: State = reactive<State>({
-      from: 76,
-      to: 80,
       scrolls: '',
       scrollsCheckbox: false,
-      exp: '30kk',
       time: '1ч'
     });
 
-    const needExp = computed(() => getExp({ from: state.from, to: state.to }));
+    const from = ref(76);
+    const to = ref(80);
+
+    const stringifiedExp = ref('30kk');
+    const exp = computed(() => parseNumber(stringifiedExp.value));
+    const isValidExp = computed(() => !Number.isNaN(exp.value));
+
+    const needExp = computed(() => getExp({ from: from.value, to: to.value }));
     const needExpStringified = computed(() => formatNumber(needExp.value));
+
     const result = computed(() => '10д 8ч 10м');
 
     return {
+      from,
+      to,
+
+      stringifiedExp,
+      exp,
+      isValidExp,
+
       needExp,
       needExpStringified,
       result,
