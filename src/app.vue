@@ -164,11 +164,12 @@ export default {
     const scrollsInputRef = ref<HTMLInputElement | null>(null);
 
     watch(scrollsCheckbox, value => {
-      scrollsValue.value = '';
-
-      if (value) {
-        nextTick(() => scrollsInputRef.value?.focus());
+      if (!value) {
+        scrollsValue.value = '';
+        return;
       }
+
+      nextTick(() => scrollsInputRef.value?.focus());
     });
 
     return {
