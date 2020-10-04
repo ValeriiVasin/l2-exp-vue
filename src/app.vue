@@ -115,7 +115,7 @@ form input.error {
 </style>
 
 <script lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
@@ -167,15 +167,14 @@ export default {
       scrollsValue.value = '';
 
       if (value) {
-        setTimeout(() => {
-          scrollsInputRef.value?.focus();
-        });
+        nextTick(() => scrollsInputRef.value?.focus());
       }
     });
 
     return {
       from,
       isValidFrom,
+
       to,
       isValidTo,
 
