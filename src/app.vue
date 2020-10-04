@@ -34,17 +34,18 @@
           <input
             type="checkbox"
             id="scroll-checkbox"
-            v-model="state.scrollsCheckbox"
+            v-model="scrollsCheckbox"
           />
         </div>
 
-        <div class="pure-control-group" v-if="state.scrollsCheckbox">
+        <div class="pure-control-group" v-if="scrollsCheckbox">
           <label for="scrolls" />
           <input
+            ref="scrollsInputRef"
             type="text"
             id="scrolls"
             placeholder="37kk"
-            v-model.trim="state.scrolls"
+            v-model.trim="scrollsValue"
           />
         </div>
 
@@ -114,26 +115,16 @@ form input.error {
 </style>
 
 <script lang="ts">
-import { reactive, computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
 import { parseTime } from './helpers/parse-time';
 import { timeToString } from './helpers/time-to-string';
 
-interface State {
-  scrolls: string;
-  scrollsCheckbox: boolean;
-}
-
 export default {
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
   setup() {
-    const state: State = reactive<State>({
-      scrolls: '',
-      scrollsCheckbox: false
-    });
-
     const from = ref(76);
     const to = ref(80);
 
@@ -168,6 +159,20 @@ export default {
       return timeToString(Math.floor(needExp.value / expPerMinute.value));
     });
 
+    const scrollsCheckbox = ref(false);
+    const scrollsValue = ref('');
+    const scrollsInputRef = ref<HTMLInputElement | null>(null);
+
+    watch(scrollsCheckbox, value => {
+      scrollsValue.value = '';
+
+      if (value) {
+        setTimeout(() => {
+          scrollsInputRef.value?.focus();
+        });
+      }
+    });
+
     return {
       from,
       isValidFrom,
@@ -178,13 +183,16 @@ export default {
       exp,
       isValidExp,
 
+      scrollsCheckbox,
+      scrollsValue,
+      scrollsInputRef,
+
       stringifiedTime,
       isValidTime,
 
       needExp,
       needExpStringified,
-      result,
-      state
+      result
     };
   }
 };
