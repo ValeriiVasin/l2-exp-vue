@@ -44,8 +44,10 @@
             ref="scrollsInputRef"
             type="text"
             id="scrolls"
+            autocomplete="off"
             placeholder="37kk"
             v-model.trim="scrollsValue"
+            :class="{ error: scrollsValue !== '' && !isScrollsExpValid }"
           />
         </div>
 
@@ -136,7 +138,25 @@ export default {
         typeof to.value === 'number' && to.value > from.value && to.value < 90
     );
 
-    const needExp = computed(() => getExp({ from: from.value, to: to.value }));
+    const levelExp = computed(() => getExp({ from: from.value, to: to.value }));
+
+    const scrollsCheckbox = ref(false);
+    const scrollsValue = ref('');
+    const scrollsExp = computed(() => parseNumber(scrollsValue.value));
+    const isScrollsExpValid = computed(
+      () => !Number.isNaN(scrollsExp.value) && scrollsExp.value > 0
+    );
+    const scrollsInputRef = ref<HTMLInputElement | null>(null);
+
+    const needExp = computed(() => {
+      if (!scrollsCheckbox.value) {
+        return levelExp.value;
+      }
+
+      return isScrollsExpValid.value
+        ? levelExp.value - scrollsExp.value
+        : levelExp.value;
+    });
     const needExpStringified = computed(() => formatNumber(needExp.value));
 
     const stringifiedExp = ref('30kk');
@@ -151,18 +171,6 @@ export default {
 
     const expPerMinute = computed(() => Math.floor(exp.value / time.value));
 
-    const result = computed(() => {
-      if (expPerMinute.value === 0) {
-        return '';
-      }
-
-      return timeToString(Math.floor(needExp.value / expPerMinute.value));
-    });
-
-    const scrollsCheckbox = ref(false);
-    const scrollsValue = ref('');
-    const scrollsInputRef = ref<HTMLInputElement | null>(null);
-
     watch(scrollsCheckbox, value => {
       if (!value) {
         scrollsValue.value = '';
@@ -170,6 +178,14 @@ export default {
       }
 
       nextTick(() => scrollsInputRef.value?.focus());
+    });
+
+    const result = computed(() => {
+      if (expPerMinute.value === 0) {
+        return '';
+      }
+
+      return timeToString(Math.floor(needExp.value / expPerMinute.value));
     });
 
     return {
@@ -185,12 +201,12 @@ export default {
 
       scrollsCheckbox,
       scrollsValue,
+      isScrollsExpValid,
       scrollsInputRef,
 
       stringifiedTime,
       isValidTime,
 
-      needExp,
       needExpStringified,
       result
     };
