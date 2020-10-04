@@ -34,17 +34,20 @@
           <input
             type="checkbox"
             id="scroll-checkbox"
-            v-model="state.scrollsCheckbox"
+            v-model="scrollsCheckbox"
           />
         </div>
 
-        <div class="pure-control-group" v-if="state.scrollsCheckbox">
+        <div class="pure-control-group" v-if="scrollsCheckbox">
           <label for="scrolls" />
           <input
+            ref="scrollsInputRef"
             type="text"
             id="scrolls"
+            autocomplete="off"
             placeholder="37kk"
-            v-model.trim="state.scrolls"
+            v-model.trim="scrollsValue"
+            :class="{ error: scrollsValue !== '' && !isScrollsExpValid }"
           />
         </div>
 
@@ -114,26 +117,16 @@ form input.error {
 </style>
 
 <script lang="ts">
-import { reactive, computed, ref } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 import { getExp } from './helpers/get-exp';
 import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
 import { parseTime } from './helpers/parse-time';
 import { timeToString } from './helpers/time-to-string';
 
-interface State {
-  scrolls: string;
-  scrollsCheckbox: boolean;
-}
-
 export default {
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
   setup() {
-    const state: State = reactive<State>({
-      scrolls: '',
-      scrollsCheckbox: false
-    });
-
     const from = ref(76);
     const to = ref(80);
 
@@ -145,7 +138,25 @@ export default {
         typeof to.value === 'number' && to.value > from.value && to.value < 90
     );
 
-    const needExp = computed(() => getExp({ from: from.value, to: to.value }));
+    const levelExp = computed(() => getExp({ from: from.value, to: to.value }));
+
+    const scrollsCheckbox = ref(false);
+    const scrollsValue = ref('');
+    const scrollsExp = computed(() => parseNumber(scrollsValue.value));
+    const isScrollsExpValid = computed(
+      () => !Number.isNaN(scrollsExp.value) && scrollsExp.value > 0
+    );
+    const scrollsInputRef = ref<HTMLInputElement | null>(null);
+
+    const needExp = computed(() => {
+      if (!scrollsCheckbox.value) {
+        return levelExp.value;
+      }
+
+      return isScrollsExpValid.value
+        ? levelExp.value - scrollsExp.value
+        : levelExp.value;
+    });
     const needExpStringified = computed(() => formatNumber(needExp.value));
 
     const stringifiedExp = ref('30kk');
@@ -160,6 +171,15 @@ export default {
 
     const expPerMinute = computed(() => Math.floor(exp.value / time.value));
 
+    watch(scrollsCheckbox, value => {
+      if (!value) {
+        scrollsValue.value = '';
+        return;
+      }
+
+      nextTick(() => scrollsInputRef.value?.focus());
+    });
+
     const result = computed(() => {
       if (expPerMinute.value === 0) {
         return '';
@@ -171,6 +191,7 @@ export default {
     return {
       from,
       isValidFrom,
+
       to,
       isValidTo,
 
@@ -178,13 +199,16 @@ export default {
       exp,
       isValidExp,
 
+      scrollsCheckbox,
+      scrollsValue,
+      isScrollsExpValid,
+      scrollsInputRef,
+
       stringifiedTime,
       isValidTime,
 
-      needExp,
       needExpStringified,
-      result,
-      state
+      result
     };
   }
 };
