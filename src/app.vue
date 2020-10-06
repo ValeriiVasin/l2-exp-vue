@@ -86,13 +86,26 @@
           />
         </div>
 
-        <div
-          class="pure-control-group"
-          v-if="isValidExp && isValidTime && result"
-        >
-          <label for="result">потребуется</label>
-          <input type="text" readonly id="result" :value="result" />
-        </div>
+        <template v-if="isValidResult && isValidExp && isValidTime">
+          <div class="pure-control-group" v-if="isRelativeResult">
+            <label
+              @click="toggle"
+              class="togglable"
+              title="переключиться к дате"
+              >потребуется</label
+            >
+            <input type="text" readonly :value="resultString" />
+          </div>
+          <div class="pure-control-group" v-else>
+            <label
+              @click="toggle"
+              class="togglable"
+              title="переключиться ко времени"
+              >завершится</label
+            >
+            <input type="text" readonly :value="resultDate" />
+          </div>
+        </template>
       </fieldset>
     </form>
   </main>
@@ -114,6 +127,10 @@ form input.error {
     border-color: red;
   }
 }
+
+.togglable {
+  cursor: pointer;
+}
 </style>
 
 <script lang="ts">
@@ -123,6 +140,8 @@ import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
 import { parseTime } from './helpers/parse-time';
 import { timeToString } from './helpers/time-to-string';
+import formatRelative from 'date-fns/formatRelative';
+import { ru } from 'date-fns/locale';
 
 export default {
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -182,11 +201,34 @@ export default {
 
     const result = computed(() => {
       if (expPerMinute.value === 0) {
+        return Infinity;
+      }
+
+      return Math.floor(needExp.value / expPerMinute.value);
+    });
+    const isValidResult = computed(() => Number.isFinite(result.value));
+    const resultString = computed(() => {
+      if (!isValidResult.value) {
         return '';
       }
 
-      return timeToString(Math.floor(needExp.value / expPerMinute.value));
+      return timeToString(result.value);
     });
+
+    const resultDate = computed(() => {
+      if (!isValidResult.value) {
+        return '';
+      }
+
+      const date = new Date();
+      date.setMinutes(date.getMinutes() + result.value);
+
+      return formatRelative(date, new Date(), { locale: ru });
+    });
+
+    const isRelativeResult = ref(true);
+
+    const toggle = () => (isRelativeResult.value = !isRelativeResult.value);
 
     return {
       from,
@@ -208,7 +250,12 @@ export default {
       isValidTime,
 
       needExpStringified,
-      result
+
+      isValidResult,
+      resultString,
+      resultDate,
+      isRelativeResult,
+      toggle
     };
   }
 };
