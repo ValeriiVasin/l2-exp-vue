@@ -9,7 +9,7 @@
             type="number"
             id="from"
             v-model.number="from"
-            min="0"
+            min="1"
             max="90"
             step="any"
             :class="{ error: !isValidFrom }"
@@ -22,7 +22,7 @@
             type="number"
             id="to"
             v-model.number="to"
-            :min="from"
+            min="1"
             max="90"
             step="any"
             :class="{ error: !isValidTo }"
@@ -142,6 +142,7 @@ import { parseTime } from './helpers/parse-time';
 import { timeToString } from './helpers/time-to-string';
 import formatRelative from 'date-fns/formatRelative';
 import { ru } from 'date-fns/locale';
+import { formatExp } from './helpers/format-exp';
 
 export default {
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -169,14 +170,16 @@ export default {
 
     const needExp = computed(() => {
       if (!scrollsCheckbox.value) {
-        return levelExp.value;
+        return Math.max(0, levelExp.value);
       }
 
-      return isScrollsExpValid.value
+      const value = isScrollsExpValid.value
         ? levelExp.value - scrollsExp.value
         : levelExp.value;
+
+      return Math.max(0, value);
     });
-    const needExpStringified = computed(() => formatNumber(needExp.value));
+    const needExpStringified = computed(() => formatExp(needExp.value));
 
     const stringifiedExp = ref('30kk');
     const exp = computed(() => parseNumber(stringifiedExp.value));

@@ -20,5 +20,5 @@ export function timeToString(time: number): string {
     result.push(`${minutes}m`);
   }
 
-  return result.length ? result.join(' ') : '1m';
+  return result.length ? result.join(' ') : '0m';
 }
