@@ -81,7 +81,7 @@
             id="time"
             autocomplete="off"
             v-model.trim="stringifiedTime"
-            placeholder="20м"
+            placeholder="2д 1ч 20м"
             :class="{ error: !isValidTime }"
           />
         </div>
@@ -94,7 +94,12 @@
               title="переключиться к дате"
               >потребуется</label
             >
-            <input type="text" readonly :value="resultString" />
+            <input
+              type="text"
+              readonly
+              :value="resultString"
+              :title="resultDate"
+            />
           </div>
           <div class="pure-control-group" v-else>
             <label
