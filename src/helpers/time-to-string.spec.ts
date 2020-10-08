@@ -2,7 +2,7 @@ import { timeToString } from './time-to-string';
 
 describe('time to string', () => {
   it('less than a minute', () => {
-    expect(timeToString(0)).toBe('1m');
+    expect(timeToString(0)).toBe('0m');
   });
 
   it('minutes', () => {
