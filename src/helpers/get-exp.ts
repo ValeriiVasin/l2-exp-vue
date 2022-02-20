@@ -1,3 +1,5 @@
+import { MAX_LEVEL } from '../constants';
+
 // https://l2central.info/classic/Уровень_персонажа
 const levels = new Map([
   [1, 0],
@@ -89,11 +91,23 @@ const levels = new Map([
   [87, 12_484_366_583_095],
   [88, 22_982_942_552_791],
   [89, 35_581_233_716_426],
-  [90, 50_699_183_112_788]
+  [90, 50_699_183_112_788],
+  [91, 126_288_930_094_600],
+  [92, 219_717_789_420_024],
+  [93, 630_290_119_652_118]
+
+  // numeric value error
+  // [94, 2_354_693_906_626_910],
+  // [95, 9_597_189_811_921_050],
+  // [96, 82_022_148_864_862_400],
+  // [97, 661_421_821_288_393_000],
+  // [98, 1_820_221_166_135_450_000],
+  // [99, 4_137_819_855_829_580_000],
+  // [100, 8_773_017_235_217_830_000]
 ]);
 
 function levelToExp(lvl: number): number {
-  if (lvl > 90 || lvl < 1) {
+  if (lvl > MAX_LEVEL || lvl < 1) {
     return 0;
   }
 
@@ -101,9 +115,17 @@ function levelToExp(lvl: number): number {
   const rest = lvl - base;
 
   const baseExp = levels.get(base);
-  const nextExp = levels.get(base + 1);
 
-  if (typeof baseExp !== 'number' || typeof nextExp !== 'number') {
+  if (typeof baseExp !== 'number') {
+    return 0;
+  }
+
+  if (rest === 0) {
+    return baseExp;
+  }
+
+  const nextExp = levels.get(base + 1);
+  if (typeof nextExp !== 'number') {
     return 0;
   }
 

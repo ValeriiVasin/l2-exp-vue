@@ -10,7 +10,7 @@
             id="from"
             v-model.number="from"
             min="1"
-            max="90"
+            max="93"
             step="any"
             :class="{ error: !isValidFrom }"
           />
@@ -23,7 +23,7 @@
             id="to"
             v-model.number="to"
             min="1"
-            max="90"
+            max="93"
             step="any"
             :class="{ error: !isValidTo }"
           />
@@ -147,6 +147,7 @@ import { timeToString } from './helpers/time-to-string';
 import formatRelative from 'date-fns/formatRelative';
 import { ru } from 'date-fns/locale';
 import { formatExp } from './helpers/format-exp';
+import { MAX_LEVEL } from './constants';
 
 export default {
   /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
@@ -155,11 +156,11 @@ export default {
     const to = ref(80);
 
     const isValidFrom = computed(
-      () => typeof from.value === 'number' && from.value >= 1 && from.value < 90
+      () => typeof from.value === 'number' && from.value >= 1 && from.value < MAX_LEVEL
     );
     const isValidTo = computed(
       () =>
-        typeof to.value === 'number' && to.value > from.value && to.value < 90
+        typeof to.value === 'number' && to.value > from.value && to.value <= MAX_LEVEL
     );
 
     const levelExp = computed(() => getExp({ from: from.value, to: to.value }));
