@@ -141,7 +141,6 @@ form input.error {
 <script lang="ts">
 import { computed, ref, watch, nextTick } from 'vue';
 import { getExp } from './helpers/get-exp';
-import { formatNumber } from './helpers/format-number';
 import { parseNumber } from './helpers/parse-number';
 import { parseTime } from './helpers/parse-time';
 import { timeToString } from './helpers/time-to-string';
