@@ -32,4 +32,8 @@ describe('time to string', () => {
   it('days, hours and minutes', () => {
     expect(timeToString(26 * 60 + 3)).toBe('1d 2h 3m');
   });
+
+  it('supports bigint', () => {
+    expect(timeToString(BigInt(60))).toBe('1h');
+  });
 });
