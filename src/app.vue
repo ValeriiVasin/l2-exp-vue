@@ -166,6 +166,10 @@ export default {
         return BigInt(-1);
       }
 
+      if (!isValidTime.value) {
+        return BigInt(-1);
+      }
+
       return needExp.value / BigInt(Math.round(expPerMinute.value));
     });
     const isValidResult = computed(() => result.value > 0);
