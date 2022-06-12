@@ -1,40 +1,48 @@
-export function formatExp(exp: number): string {
-  if (exp < 1000) {
-    return String(exp);
+function bigIntAdjustments(
+  value: number | bigint
+): { value: number; power: number } {
+  if (typeof value === 'number') {
+    return { value, power: 0 };
   }
 
-  if (exp <= 1_000_000) {
-    const value = Math.round(exp / 1000);
-
-    return value === 1_000 ? '1kk' : `${value}k`;
-  }
-
-  const base = 1_000;
+  const base = BigInt(1_000);
   let power = 0;
-
-  while (exp >= base) {
+  while (value > Number.MAX_SAFE_INTEGER) {
+    value /= base;
     power += 1;
-    exp = exp / base;
   }
 
-  if (Math.round(exp) === base) {
-    return `1${'k'.repeat(power + 1)}`;
-  }
-
-  return `${format(exp, 2)}${'k'.repeat(power)}`;
+  return { value: Number(value), power };
 }
 
-function format(value: number, digits: number) {
-  const ceil = Math.floor(value);
-  let frac = Math.round((value - ceil) * Math.pow(10, digits));
+export function formatExp(initialValue: number | bigint): string {
+  let { power, value } = bigIntAdjustments(initialValue);
 
-  while (frac % 10 === 0) {
-    frac /= 10;
+  const base = 1_000;
+  while (value >= base) {
+    power += 1;
+    value /= base;
   }
 
-  if (frac === 0) {
-    return ceil;
+  // 9.99k => 10k
+  if (power === 1) {
+    value = Math.round(value);
   }
 
-  return `${ceil}.${frac}`;
+  // fix 999.999 => 1000.00 roundation by toFixed()
+  if (value > 999.994) {
+    value = 1;
+    power++;
+  }
+
+  return `${format(value, 2)}${'k'.repeat(power)}`;
+}
+
+function format(value: number, digits: number): string {
+  // replace trailing zeros from toFixed(): 1.70 => 1.7
+  // replace extra dot case after zeros removal: 1. => 1
+  return value
+    .toFixed(digits)
+    .replace(/0+$/, '')
+    .replace(/\.$/, '');
 }

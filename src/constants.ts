@@ -1,1 +1,1 @@
-export const MAX_LEVEL = 93;
+export const MAX_LEVEL = 100;

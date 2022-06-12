@@ -1,11 +1,15 @@
-const DAY_IN_MINUTES = 60 * 24;
-const HOUR_IN_MINUTES = 60;
-export function timeToString(time: number): string {
-  const days = Math.floor(time / DAY_IN_MINUTES);
-  time -= days * DAY_IN_MINUTES;
-  const hours = Math.floor(time / HOUR_IN_MINUTES);
-  time -= hours * HOUR_IN_MINUTES;
-  const minutes = time;
+const DAY_IN_MINUTES = BigInt(60 * 24);
+const HOUR_IN_MINUTES = BigInt(60);
+export function timeToString(timeInMinutes: number | bigint): string {
+  if (typeof timeInMinutes === 'number') {
+    timeInMinutes = BigInt(timeInMinutes);
+  }
+
+  const days = timeInMinutes / DAY_IN_MINUTES;
+  timeInMinutes -= days * DAY_IN_MINUTES;
+  const hours = timeInMinutes / HOUR_IN_MINUTES;
+  timeInMinutes -= hours * HOUR_IN_MINUTES;
+  const minutes = timeInMinutes;
 
   const result: string[] = [];
   if (days) {
